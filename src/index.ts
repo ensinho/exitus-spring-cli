@@ -23,7 +23,8 @@ program
   .command('new <entity-name>')
   .description('Generate a new Spring Boot entity with all layers (Model, Mapper, Service, Controller, Search)')
   .option('-o, --out [path]', 'Output directory for generated files (default: current directory)')
-  .option('-p, --package <package>', 'Base package name (e.g., com.exitus.educ.academico)')
+  .option('-p, --package <package>', 'Package name or sub-package (e.g., academico or com.exitus.educ.academico)')
+  .option('-b, --base-package <basePackage>', 'Base package prefix', 'com.exitus.educ')
   .option('-s, --schema <schema>', 'Database schema name', 'aprendizagem')
   .option('--skip-model', 'Skip generating the Model class')
   .option('--skip-mapper', 'Skip generating the Mapper interface')
@@ -42,6 +43,12 @@ program
     if (!options.out || options.out === true) {
       options.out = process.cwd();
     }
+    
+    // Se passou -p sem pontos, assume que é subpacote e concatena com base
+    if (options.package && !options.package.includes('.')) {
+      options.package = `${options.basePackage}.${options.package}`;
+    }
+    
     newCommand(entityName, options);
   });
 
