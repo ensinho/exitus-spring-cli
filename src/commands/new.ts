@@ -34,6 +34,31 @@ function normalizeOutputPath(outPath: string): string {
   return absolutePath;
 }
 
+/**
+ * Try to detect the Java package name from the output path.
+ * Looks for patterns like: src/main/java/com/exitus/educ/academico
+ */
+function detectPackageFromPath(outPath: string): string | null {
+  const absolutePath = path.resolve(outPath);
+  
+  // Look for src/main/java in the path
+  const javaMatch = absolutePath.match(/src[\/\\]main[\/\\]java[\/\\](.+)/);
+  if (javaMatch) {
+    // Convert path to package name: com/exitus/educ/academico -> com.exitus.educ.academico
+    const packagePath = javaMatch[1];
+    // Remove known subfolders from the end
+    const knownSubfolders = ['controller', 'mapper', 'model', 'service', 'search'];
+    let cleanPath = packagePath;
+    for (const folder of knownSubfolders) {
+      const regex = new RegExp(`[/\\\\]${folder}$`);
+      cleanPath = cleanPath.replace(regex, '');
+    }
+    return cleanPath.replace(/[\/\\]/g, '.');
+  }
+  
+  return null;
+}
+
 export async function newCommand(entityName: string, options: GeneratorOptions): Promise<void> {
   console.log(chalk.cyan(`\n🚀 Generating Spring Boot components for: ${chalk.bold(entityName)}\n`));
 
@@ -45,6 +70,10 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
 
   // Normalize the output path
   const basePath = normalizeOutputPath(options.out);
+
+  // Auto-detect package from path if not provided
+  const detectedPackage = detectPackageFromPath(options.out);
+  const packageName = options.package || detectedPackage || 'com.exitus.educ.academico';
 
   // Parse fields if provided
   const fields: EntityField[] = options.fields 
@@ -63,7 +92,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
     nameKebabCase: toKebabCase(entityName),
     nameSnakeCase: toSnakeCase(entityName),
     fields,
-    packageName: options.package || 'com.exitus.educ.academico',
+    packageName: packageName,
     schema: options.schema || 'academico'
   };
 
@@ -71,7 +100,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
   const componentsToGenerate = getComponentsToGenerate(options);
 
   console.log(chalk.gray('Configuration:'));
-  console.log(chalk.gray(`  Package: ${entityConfig.packageName}`));
+  console.log(chalk.gray(`  Package: ${entityConfig.packageName}${detectedPackage && !options.package ? ' (auto-detected)' : ''}`));
   console.log(chalk.gray(`  Schema: ${entityConfig.schema}`));
   console.log(chalk.gray(`  Output: ${basePath}`));
   console.log(chalk.gray(`  Components: ${componentsToGenerate.join(', ')}`));
