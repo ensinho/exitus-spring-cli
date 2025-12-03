@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import ora from 'ora';
+import path from 'path';
 import { GeneratorOptions, EntityConfig, EntityField, GeneratedFile } from '../types';
 import { 
   toPascalCase, 
@@ -15,14 +16,35 @@ import { generateService } from '../templates/service.template';
 import { generateController } from '../templates/controller.template';
 import { generateSearch } from '../templates/search.template';
 
+/**
+ * Normalize the output path to ensure files are created in the correct structure.
+ * If running from inside a subfolder (controller, mapper, etc.), go up to the base package directory.
+ */
+function normalizeOutputPath(outPath: string): string {
+  const absolutePath = path.resolve(outPath);
+  const knownSubfolders = ['controller', 'mapper', 'model', 'service', 'search'];
+  
+  // Check if we're inside one of the known subfolders
+  const basename = path.basename(absolutePath);
+  if (knownSubfolders.includes(basename)) {
+    // Go up one level to the base package directory
+    return path.dirname(absolutePath);
+  }
+  
+  return absolutePath;
+}
+
 export async function newCommand(entityName: string, options: GeneratorOptions): Promise<void> {
-  console.log(chalk.cyan(`\n Generating Spring Boot components for: ${chalk.bold(entityName)}\n`));
+  console.log(chalk.cyan(`\n🚀 Generating Spring Boot components for: ${chalk.bold(entityName)}\n`));
 
   // Validate entity name
   if (!entityName || entityName.trim() === '') {
-    console.log(chalk.red('Error: Entity name is required'));
+    console.log(chalk.red('❌ Error: Entity name is required'));
     process.exit(1);
   }
+
+  // Normalize the output path
+  const basePath = normalizeOutputPath(options.out);
 
   // Parse fields if provided
   const fields: EntityField[] = options.fields 
@@ -51,7 +73,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
   console.log(chalk.gray('Configuration:'));
   console.log(chalk.gray(`  Package: ${entityConfig.packageName}`));
   console.log(chalk.gray(`  Schema: ${entityConfig.schema}`));
-  console.log(chalk.gray(`  Output: ${options.out}`));
+  console.log(chalk.gray(`  Output: ${basePath}`));
   console.log(chalk.gray(`  Components: ${componentsToGenerate.join(', ')}`));
   console.log();
 
@@ -60,7 +82,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
 
   if (componentsToGenerate.includes('model')) {
     generatedFiles.push({
-      path: `${options.out}/model/${entityConfig.namePascalCase}.java`,
+      path: path.join(basePath, 'model', `${entityConfig.namePascalCase}.java`),
       content: generateModel(entityConfig),
       type: 'model'
     });
@@ -68,7 +90,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
 
   if (componentsToGenerate.includes('mapper')) {
     generatedFiles.push({
-      path: `${options.out}/mapper/${entityConfig.namePascalCase}Mapper.java`,
+      path: path.join(basePath, 'mapper', `${entityConfig.namePascalCase}Mapper.java`),
       content: generateMapper(entityConfig),
       type: 'mapper'
     });
@@ -76,7 +98,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
 
   if (componentsToGenerate.includes('service')) {
     generatedFiles.push({
-      path: `${options.out}/service/${entityConfig.namePascalCase}Service.java`,
+      path: path.join(basePath, 'service', `${entityConfig.namePascalCase}Service.java`),
       content: generateService(entityConfig),
       type: 'service'
     });
@@ -84,7 +106,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
 
   if (componentsToGenerate.includes('controller')) {
     generatedFiles.push({
-      path: `${options.out}/controller/${entityConfig.namePascalCase}Controller.java`,
+      path: path.join(basePath, 'controller', `${entityConfig.namePascalCase}Controller.java`),
       content: generateController(entityConfig),
       type: 'controller'
     });
@@ -92,7 +114,7 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
 
   if (componentsToGenerate.includes('search')) {
     generatedFiles.push({
-      path: `${options.out}/search/${entityConfig.namePascalCase}Search.java`,
+      path: path.join(basePath, 'search', `${entityConfig.namePascalCase}Search.java`),
       content: generateSearch(entityConfig),
       type: 'search'
     });
