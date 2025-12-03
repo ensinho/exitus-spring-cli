@@ -69,25 +69,11 @@ export async function newCommand(entityName: string, options: GeneratorOptions):
   }
 
   // Normalize the output path
-  let basePath = normalizeOutputPath(options.out);
+  const basePath = normalizeOutputPath(options.out);
 
   // Auto-detect package from path if not provided
   const detectedPackage = detectPackageFromPath(options.out);
   const packageName = options.package || detectedPackage || 'com.exitus.educ.academico';
-
-  if (options.package) {
-    const detectedFromPath = detectPackageFromPath(basePath);
-    if (detectedFromPath && packageName.startsWith(detectedFromPath)) {
-      // Extract sub-package path
-      const subPackage = packageName.substring(detectedFromPath.length + 1); // +1 to skip the dot
-      if (subPackage) {
-        basePath = path.join(basePath, ...subPackage.split('.'));
-      }
-    } else if (!detectedFromPath) {
-      // If package not detected from path, create full structure
-      basePath = path.join(basePath, ...packageName.split('.'));
-    }
-  }
 
   // Parse fields if provided
   const fields: EntityField[] = options.fields 
