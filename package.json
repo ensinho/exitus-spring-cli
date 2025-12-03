@@ -1,6 +1,6 @@
 {
   "name": "exitus-spring-cli",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "CLI tool for generating Spring Boot components following Exitus patterns (Model, Mapper, Service, Controller, Search)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
