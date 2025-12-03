@@ -22,7 +22,7 @@ program
 program
   .command('new <entity-name>')
   .description('Generate a new Spring Boot entity with all layers (Model, Mapper, Service, Controller, Search)')
-  .option('-o, --out <path>', 'Output directory for generated files', '.')
+  .option('-o, --out [path]', 'Output directory for generated files (default: current directory)')
   .option('-p, --package <package>', 'Base package name (e.g., com.exitus.educ.academico)')
   .option('-s, --schema <schema>', 'Database schema name', 'academico')
   .option('--skip-model', 'Skip generating the Model class')
@@ -37,7 +37,13 @@ program
   .option('--only-search', 'Generate only the Search record')
   .option('--dry-run', 'Preview generated files without creating them')
   .option('-f, --fields <fields>', 'Comma-separated list of fields (e.g., "titulo:String,descricao:String,ativo:Boolean")')
-  .action(newCommand);
+  .action((entityName, options) => {
+    // Handle empty or missing -o argument
+    if (!options.out || options.out === true) {
+      options.out = process.cwd();
+    }
+    newCommand(entityName, options);
+  });
 
 program
   .command('init')
