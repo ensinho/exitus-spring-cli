@@ -1,0 +1,68 @@
+{
+  "name": "exitus-spring-cli",
+  "version": "0.1.0",
+  "description": "CLI tool for generating Spring Boot components following Exitus patterns (Model, Mapper, Service, Controller, Search)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "exitus-spring-cli": "dist/index.js",
+    "esc": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "rebuild": "npm run clean && npm run build",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"No tests yet\" && exit 0",
+    "prepublishOnly": "npm run rebuild",
+    "postpublish": "echo \"Published successfully!\""
+  },
+  "keywords": [
+    "cli",
+    "spring-boot",
+    "java",
+    "generator",
+    "exitus",
+    "scaffold",
+    "mybatis",
+    "rest-api",
+    "code-generator",
+    "spring",
+    "boilerplate",
+    "crud"
+  ],
+  "author": "Exitus Team",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^8.2.10",
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.2"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ensinho/exitus-spring-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ensinho/exitus-spring-cli/issues"
+  },
+  "homepage": "https://github.com/ensinho/exitus-spring-cli#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

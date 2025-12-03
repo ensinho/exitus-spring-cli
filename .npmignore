@@ -1,0 +1,36 @@
+# Source files (only dist is needed for npm)
+src/
+tsconfig.json
+
+# Development files
+.gitignore
+.git/
+.idea/
+.vscode/
+
+# Documentation (keep README.md)
+DOCUMENTATION_SPRING_CLI.md
+
+# Test files
+*.spec.ts
+*.test.ts
+coverage/
+__tests__/
+
+# Development configs
+.editorconfig
+.prettierrc
+.eslintrc*
+jest.config.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files (optional, some prefer to include)
+package-lock.json
+yarn.lock

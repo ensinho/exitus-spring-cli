@@ -1,0 +1,1 @@
+export { newCommand } from './new';
